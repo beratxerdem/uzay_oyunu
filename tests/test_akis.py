@@ -2,9 +2,12 @@ from itertools import islice, takewhile
 from uzay_oyunu.akis import fibonacci
 from pathlib import Path
 from uzay_oyunu.akis import( 
-    fibonacci,yakit_gostergesi,satirlari_oku,ayristir,uzun_yolculuklar,rota_sayaci
+    fibonacci,yakit_gostergesi,satirlari_oku,ayristir,uzun_yolculuklar,rota_sayaci,
 )
 from uzay_oyunu.oyun import harita_yukle, travel
+from uzay_oyunu.istatistik import(
+    büyük_harfli_gezegenler_lc,büyük_harfli_gezegenler_map,en_az_iki_baglantili_filter,en_az_iki_baglantili_lc,hizli_yolculuk,toplam_baglanti_reduce,toplam_baglanti_sum,yolculuk,
+)
 
 def test_fibonacci_uc_yol() -> None:
     """fibonacci generatorunun next, islice ve takwhile ile kullanımını test eder."""
@@ -60,3 +63,12 @@ def test_rota_sayaci() -> None:
     #önbellegin calıstıgını dogrular
     bilgi = say.cache_info()
     assert bilgi.hits > 0
+
+
+def test_istatistik_soruları() -> None:
+    """görev 5deki üç sorunun iki farklı yonötemlede aynı sonucu verdiğini testler"""
+    galaksi = harita_yukle()
+
+    #büyük harfli gezegenler
+    beklenen_buyuk = ["DÜNYA", "CENTAURI", "SIRIUS", "ORION", "KARA_DELIK"]
+    assert büyük_harfli_gezegenler_map

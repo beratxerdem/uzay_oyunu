@@ -2,14 +2,15 @@ from itertools import islice, takewhile
 from uzay_oyunu.akis import fibonacci
 from pathlib import Path
 from uzay_oyunu.akis import( 
-    fibonacci,yakitGöstergesi,satirlari_oku,ayristir,uzun_yolculuklar
+    fibonacci,yakit_gostergesi,satirlari_oku,ayristir,uzun_yolculuklar,rota_sayaci
 )
+from uzay_oyunu.oyun import harita_yukle, travel
 
 def test_fibonacci_uc_yol() -> None:
     """fibonacci generatorunun next, islice ve takwhile ile kullanımını test eder."""
     #next ile 3 deger
     g = fibonacci()
-    assert(next(g), next(g), next(g) == (0,1,1))
+    assert (next(g), next(g), next(g)) == (0, 1, 1)
 
     #is lice ile ilk 12
 
@@ -47,3 +48,15 @@ def test_seyir_defteri_pipeline() -> None:
     kayitlar = ayristir(satirlari_oku(dosya_yolu))
     hedefler = [h for _, h, _ in uzun_yolculuklar(kayitlar, 10)]
     assert hedefler == ["sirius", "centauri", "orion", "kara_delik"]
+
+
+def test_rota_sayaci() -> None:
+    """önebellekli rotasayacinin örnekleri dogru hesapladıgını test eder"""
+    galaksi = harita_yukle()
+    say = rota_sayaci(galaksi["baglantilar"])
+
+    assert (say("dünya", 3), say("dünya", 10), say("dünya", 40)) == (15, 11683, 20975801689045883)#benim testimin sonuçları
+
+    #önbellegin calıstıgını dogrular
+    bilgi = say.cache_info()
+    assert bilgi.hits > 0

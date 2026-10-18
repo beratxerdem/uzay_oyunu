@@ -2,6 +2,8 @@ import json
 from pathlib import Path
 from typing import Any
 from uzay_oyunu.araclar import hamle_sayaci
+from uzay_oyunu.akis import yakit_gostergesi
+
 
 
 def envanter_metni(credits: bool, engines: bool, copilot: bool) -> str:
@@ -55,7 +57,7 @@ def harita_yukle() -> dict[str, Any]:
 
 
 def travel() -> None:
-    """Uzay oyununun ana seyahat fonksiyonu (Görev 5 son hali)."""
+    """Uzay oyununun ana seyahat fonksiyonu (4. hafta görev 2 hali)."""
     galaksi = harita_yukle()
     planet = galaksi["konum"]
     credits = False
@@ -64,6 +66,7 @@ def travel() -> None:
 
     sayac = hamle_sayaci()
     toplam_hamle = 0
+    gosterge = yakit_gostergesi(galaksi["yakit"], 5)
 
     while True:
         print(f"\nŞu anki gezegen: {planet}")
@@ -91,6 +94,11 @@ def travel() -> None:
         if secim == "q":
             break
         if secim.isdigit() and 1 <= int(secim) <= len(destinations):
+            try:
+                galaksi["yakit"] = next(gosterge)
+            except StopIteration:
+                print("Yakıtın bitti, uzayda sürükleniyorsun.")
+                break
             planet = destinations[int(secim) - 1]
             galaksi["konum"] = planet
             toplam_hamle = sayac()

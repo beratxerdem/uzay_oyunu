@@ -1,4 +1,6 @@
-from collections.abc import Iterator,Iterable
+import time
+from functools import lru_cache
+from collections.abc import Callable,Iterator,Iterable
 from itertools import islice, takewhile
 from pathlib import Path
 def fibonacci() -> Iterator[int]:
@@ -8,9 +10,9 @@ def fibonacci() -> Iterator[int]:
         yield a
         a,b = b,a + b
 
-def yakitGöstergesi(yakıt: int, tüketim: int):
+def yakit_gostergesi(yakit: int, tüketim: int):
     """her next() cagrısında tüketim kadar azalıp kalan yakıtı üretir ve döndürür yakıt 0a gelince durur."""
-    while yakıt>0:
+    while yakit>0:
         yakit = max(0, yakit - tüketim)
         yield yakit
 
@@ -41,6 +43,33 @@ def uzun_yolculuklar(kayitlar: Iterable[tuple[str,str,int]], esik: int) -> Itera
 
 
 
+def rota_sayaci(baglantilar: dict[str,list[str]]) -> Callable[[str,int], int]:
+    """icinde @lru cache ile süslenmiş rota sayısı(gezegen, adim) fonksiyonunu tanımlayıp döner."""
+
+    @lru_cache(maxsize=None)
+    def rota_sayisi(gezegen: str, adim: int) -> int: 
+        if adim == 0:
+            return 1
+        return sum(
+            rota_sayisi(komsu,adim - 1)
+            for komsu in baglantilar.get(gezegen, [])
+        )
+    return rota_sayisi
+
+
+def onbelleksiz_rota_sayaci(baglantilar: dict[str, list[str]]) -> Callable[[str,int], int]:
+    """performans karşılaştırması adim=20 ölçümü için önbelleksiz rota sayacı."""
+    def rota_sayisi(gezegen: str, adim: int) -> int: 
+            if adim == 0:
+                return 1
+            return sum(
+                rota_sayisi(komsu,adim - 1)
+                for komsu in baglantilar.get(gezegen, [])
+            )
+    return rota_sayisi
+    
+
+
 
 if __name__ == "__main__":
     #next ile ilk üç değer
@@ -54,10 +83,26 @@ if __name__ == "__main__":
     print("100den kücük değerler: ", list(takewhile(lambda x: x<100, fibonacci())))
 
     #görev 2 yakıt göstergesi
-    print("Yakıt göstergesi (100, 30):", list(yakitGöstergesi(100,30)))
+    print("Yakıt göstergesi (100, 30):", list(yakit_gostergesi(100,30)))
 
 
+# önbellekli ve önbelleksiz Rota Sayacı Karşılaştırması
+    ornek_baglantilar = {
+        "sirius": ["dünya", "centauri", "orion", "kara_delik"],
+        "centauri": ["dünya", "sirius", "orion"],
+        "dünya": ["centauri", "sirius"],
+        "orion": ["centauri", "sirius"],
+        "kara_delik": [],
+    }
+    say_onbelleksiz = onbelleksiz_rota_sayaci(ornek_baglantilar)
+    basla1 = time.perf_counter()
+    sonuc1 = say_onbelleksiz("dünya", 20)
+    bitis1 = time.perf_counter()
+    print(f"\nÖnbelleksiz (adim=20): {sonuc1} | Süre: {bitis1 - basla1:.6f} sn")
 
-
-
-    
+    say_onbellekli = rota_sayaci(ornek_baglantilar)
+    basla2 = time.perf_counter()
+    sonuc2 = say_onbellekli("dünya", 20)
+    bitis2 = time.perf_counter()
+    print(f"Önbellekli  (adim=20): {sonuc2} | Süre: {bitis2 - basla2:.6f} sn")
+    print("Cache Info (adim=20):", say_onbellekli.cache_info())  # type: ignore[attr-defined]

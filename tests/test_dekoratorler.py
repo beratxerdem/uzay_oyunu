@@ -1,5 +1,5 @@
 import pytest
-from uzay_oyunu.dekoratorler import log_cagri, say, sure_olc
+from uzay_oyunu.dekoratorler import log_cagri, say, sure_olc, yakit_harca
 from functools import lru_cache
 from uzay_oyunu.komutlar import KOMUTLAR, envanter, harita, komut, yardim
 
@@ -107,3 +107,8 @@ def test_harita_komutu() -> None:
         "baglantilar": {"sirius": ["orion", "dünya", "kara_delik"]},
     }
     assert harita(durum) == "orion, dünya, kara_delik"
+
+def test_sinirla_dekoratoru_sinir_degerler() -> None:
+    """sınır değerlerinin (0 ve 100) ValueError döndürmedigini test eder."""
+    assert yakit_harca(0) == 100
+    assert yakit_harca(100) == 0

@@ -81,3 +81,28 @@ if __name__ == "__main__": #uzun süre beklememek için yorum satırı olarak tu
     print("yalnızca @say                :", fib_sadece_say.cagri)
     print("@say üstte, @lru_cache altta :", fib_say_ustte.cagri)
     print("@lru_cache üstte, @say altta :", fib_cache_ustte.__wrapped__.cagri)
+
+
+def sinirla(alt: int | float, ust: int | float) -> Callable[..., Any]:
+    """dekore edilen fonksiyonun ilk argümanı [alt, ust] aralığında değilse ValueError döndürür"""
+
+    def dekorator(fonksiyon: Callable[..., Any]) -> Callable[..., Any]:
+        @wraps(fonksiyon)
+        def sarmalayici(*args: Any, **kwargs: Any) -> Any:
+            if args:
+                ilk_deger = args[0]
+                if not (alt <= ilk_deger <= ust):
+                    raise ValueError(
+                        f"{fonksiyon.__name__}: {ilk_deger} değeri {alt}-{ust} aralığında değil"
+                    )
+            return fonksiyon(*args, **kwargs)
+
+        return sarmalayici
+
+    return dekorator
+
+@sinirla(0, 100)
+def yakit_harca(miktar: int) -> int: #testlerde cagırabilmek icin burda kullanacğaım.
+    """verilen miktar kadar yakıt harcar ve kalan yakıtı döndürür."""
+    baslangic_yakit = 100
+    return baslangic_yakit - miktar

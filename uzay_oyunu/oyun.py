@@ -58,7 +58,9 @@ def harita_yukle() -> dict[str, Any]:
 
 
 def travel() -> None:
-    """Uzay oyununun ana seyahat fonksiyonu (4. hafta görev 2 hali)."""
+    """uzay oyununun ana seyahat fonksiyonu"""
+    from uzay_oyunu.komutlar import KOMUTLAR
+
     galaksi = harita_yukle()
     planet = galaksi["konum"]
     credits = False
@@ -91,9 +93,23 @@ def travel() -> None:
         destinations = galaksi["baglantilar"][planet]
         print(hedef_menusu(destinations))
 
-        secim = input("Seçiminiz (çıkmak için 'q'): ")
+        secim = input("Seçiminiz (çıkmak için 'q'): ").strip()
         if secim == "q":
             break
+
+        #girilen metin bir komut adıysa komutu çalıştır ve aynı menüyü tekrar göster
+        if secim in KOMUTLAR:
+            durum = {
+                "konum": planet,
+                "baglantilar": galaksi["baglantilar"],
+                "credits": credits,
+                "engines": engines,
+                "copilot": copilot,
+            }
+            komut_fonk, _ = KOMUTLAR[secim]
+            print(komut_fonk(durum))
+            continue
+
         if secim.isdigit() and 1 <= int(secim) <= len(destinations):
             try:
                 galaksi["yakit"] = next(gosterge)

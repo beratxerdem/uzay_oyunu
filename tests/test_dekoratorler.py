@@ -1,7 +1,7 @@
 import pytest
 from uzay_oyunu.dekoratorler import log_cagri, say, sure_olc
 from functools import lru_cache
-
+from uzay_oyunu.komutlar import KOMUTLAR, envanter, harita, komut, yardim
 
 @sure_olc
 def ornek_hesap(taban: int, us: int = 2) -> int:
@@ -65,3 +65,45 @@ def test_log_cagri(capsys: pytest.CaptureFixture[str]) -> None:
     cikti = capsys.readouterr().out
     assert "-> yolculuk('orion', hiz=3)" in cikti
     assert "<- yolculuk 'orion hiz=3'" in cikti
+
+
+def test_komut_kayit_ve_cift_isim_hatasi() -> None:
+    """komut dekoratörünün fonksiyonu değiştirmeden kaydettiğini ve çift isimde ValueError verdiğini test eder."""
+    assert "yardim" in KOMUTLAR
+    assert "envanter" in KOMUTLAR
+    assert "harita" in KOMUTLAR
+
+    #aynı ad iki kez kullanılırsa tanım anında ValueError döndürür
+    with pytest.raises(ValueError):
+
+        @komut("yardim", "tekrar tanımlama denemesi")
+        def sahte_yardim(durum: dict) -> str:
+            return ""
+
+
+def test_yardim_komutu() -> None:
+    """yardim komutunun tüm komutları ve açıklamalarını listelediğini test eder."""
+    sonuc = yardim({})
+    assert "envanter" in sonuc and "eşyalarını gösterir" in sonuc
+    assert "harita" in sonuc and "gidebileceğin gezegenleri gösterir" in sonuc
+    assert "yardim" in sonuc and "komutları listeler" in sonuc
+
+
+def test_envanter_komutu() -> None:
+    """envanter komutunun oyuncu durumuna göre doğru metni döndürdüğünü test eder."""
+    durum_bos = {"credits": False, "engines": False, "copilot": False}
+    assert envanter(durum_bos) == ""
+
+    durum_dolu = {"credits": True, "engines": True, "copilot": False}
+    sonuc = envanter(durum_dolu)
+    assert "bol kredi" in sonuc
+    assert "hiperdrive" in sonuc
+
+
+def test_harita_komutu() -> None:
+    """harita komutunun mevcut konumdaki bağlantıları virgülle ayırarak döndürdüğünü test eder."""
+    durum = {
+        "konum": "sirius",
+        "baglantilar": {"sirius": ["orion", "dünya", "kara_delik"]},
+    }
+    assert harita(durum) == "orion, dünya, kara_delik"

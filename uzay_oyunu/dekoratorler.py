@@ -26,6 +26,24 @@ def say(fonksiyon: Callable[..., Any]) -> Callable[..., Any]:
     sarmalayici.cagri = 0  # type: ignore[attr-defined]
     return sarmalayici
 
+
+
+def log_cagri(fonksiyon: Callable[..., Any]) -> Callable[..., Any]:
+    """Her çağrıdan önce fonksiyon adını/argümanlarını, sonra dönüş değerini yazdırır."""
+
+    @wraps(fonksiyon)
+    def sarmalayici(*args: Any, **kwargs: Any) -> Any:
+        konumsal = [repr(a) for a in args]
+        adli = [f"{k}={v!r}" for k, v in kwargs.items()]
+        tum_argumanlar = ", ".join(konumsal + adli)
+
+        print(f"-> {fonksiyon.__name__}({tum_argumanlar})")
+        sonuc = fonksiyon(*args, **kwargs)
+        print(f"<- {fonksiyon.__name__} {sonuc!r}")
+        return sonuc
+
+    return sarmalayici
+
 if __name__ == "__main__": #uzun süre beklememek için yorum satırı olarak tutuluyor.
     #from uzay_oyunu.akis import onbelleksiz_rota_sayaci
     #from uzay_oyunu.oyun import harita_yukle

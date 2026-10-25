@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any
 from uzay_oyunu.araclar import hamle_sayaci
 from uzay_oyunu.akis import yakit_gostergesi
+from uzay_oyunu.dekoratorler import log_cagri
 
 
 
@@ -20,7 +21,7 @@ def envanter_metni(credits: bool, engines: bool, copilot: bool) -> str:
         return ""
     return "Sende: " + ", ".join(esyalar)
 
-
+@log_cagri
 def hedef_menusu(hedefler: list[str]) -> str:
     """Gezegen hedeflerini numaralı menü metni olarak döndürür."""
     satirlar = ["Nereye gitmek istersin?"]
@@ -28,7 +29,7 @@ def hedef_menusu(hedefler: list[str]) -> str:
         satirlar.append(f"[{i}] {hedef}")
     return "\n".join(satirlar)
 
-
+@log_cagri
 def galaksi_kur(
     gezegenler: list[str],
     baglantilar: dict[str, list[str]],

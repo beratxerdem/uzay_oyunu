@@ -1,5 +1,5 @@
 import pytest
-from uzay_oyunu.dekoratorler import sure_olc, say
+from uzay_oyunu.dekoratorler import log_cagri, say, sure_olc
 from functools import lru_cache
 
 
@@ -50,3 +50,18 @@ def test_say_ve_dekorator_sirasi() -> None:
     assert fib1.cagri == 21891  # type: ignore[attr-defined]
     assert fib2.cagri == 39  # type: ignore[attr-defined]
     assert fib3.__wrapped__.cagri == 21  # type: ignore[attr-defined]
+
+
+def test_log_cagri(capsys: pytest.CaptureFixture[str]) -> None:
+    """log_cagri dekoratörünün giriş argümanlarını ve dönüş değerini doğru yazdırdığını test eder."""
+
+    @log_cagri
+    def yolculuk(hedef: str, hiz: int = 1) -> str:
+        return f"{hedef} hiz={hiz}"
+
+    sonuc = yolculuk("orion", hiz=3)
+    assert sonuc == "orion hiz=3"
+
+    cikti = capsys.readouterr().out
+    assert "-> yolculuk('orion', hiz=3)" in cikti
+    assert "<- yolculuk 'orion hiz=3'" in cikti
